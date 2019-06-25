@@ -13,16 +13,25 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayNameFor(model => model._id)
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.Name)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Role)
         </th>
-        <th></th>
+        <th>
+            Actions
+        </th>
+
     </tr>
 
 @foreach (var item in Model) {
     <tr>
+        <td>
+            @item._id
+        </td>
         <td>
             @Html.DisplayFor(modelItem => item.Name)
         </td>
@@ -30,9 +39,9 @@
             @Html.DisplayFor(modelItem => item.Role)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            @Html.ActionLink("Edit", "Edit", "User", new { @id = item._id }, new { @class = "btn btn-warning" }) 
+            @Html.ActionLink("Details", "Details", "User", new { @id = item._id }, new { @class = "btn btn-info" }) 
+            @Html.ActionLink("Delete", "Delete", "User", new { @id = item._id }, new { @class = "btn btn-danger" })
         </td>
     </tr>
 }

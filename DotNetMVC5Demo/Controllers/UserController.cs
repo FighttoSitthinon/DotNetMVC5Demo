@@ -1,6 +1,7 @@
 ﻿using DotNetMVC5Demo.App_Start;
 using DotNetMVC5Demo.Models;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,11 @@ namespace DotNetMVC5Demo.Controllers
         }
 
         // GET: User/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string id)
         {
-            return View();
+            var userId = Query<UserModel>.EQ(x => x._id, new ObjectId(id));
+            var user = _dbContext._database.GetCollection<UserModel>("users").FindOne(userId);
+            return View(user);
         }
 
         // GET: User/Create
@@ -69,18 +72,36 @@ namespace DotNetMVC5Demo.Controllers
         }
 
         // GET: User/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string id)
         {
-            return View();
+            var document = _dbContext._database.GetCollection<UserModel>("users");
+
+            var userDetailscount = document.FindAs<UserModel>(Query.EQ("_id", new ObjectId(id))).Count();
+
+            if (userDetailscount > 0)
+            {
+                var userObjectId = Query<UserModel>.EQ(p => p._id, new ObjectId(id));
+
+                var userDetail = _dbContext._database.GetCollection<UserModel>("users").FindOne(userObjectId);
+
+                return View(userDetail);
+            }
+            return RedirectToAction("Index");
         }
 
         // POST: User/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(string id, UserModel user)
         {
             try
             {
-                // TODO: Add update logic here
+                user._id = new ObjectId(id);
+                //Mongo Query  
+                var userObjectId = Query<UserModel>.EQ(p => p._id, new ObjectId(id));
+                // Document Collections  
+                var collection = _dbContext._database.GetCollection<UserModel>("users");
+                // Document Update which need Id and Data to Update  
+                var result = collection.Update(userObjectId, Update.Replace(user), UpdateFlags.None);
 
                 return RedirectToAction("Index");
             }
@@ -91,18 +112,25 @@ namespace DotNetMVC5Demo.Controllers
         }
 
         // GET: User/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
-            return View();
+            var userId = Query<UserModel>.EQ(x => x._id, new ObjectId(id));
+            var user = _dbContext._database.GetCollection<UserModel>("users").FindOne(userId);
+            return View(user);
         }
 
         // POST: User/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(string id, UserModel user)
         {
             try
             {
-                // TODO: Add delete logic here
+                //Mongo Query  
+                var userObjectid = Query<UserModel>.EQ(p => p._id, new ObjectId(id));
+                // Document Collections  
+                var collection = _dbContext._database.GetCollection<UserModel>("users");
+                // Document Delete which need ObjectId to Delete Data   
+                var result = collection.Remove(userObjectid, RemoveFlags.Single);
 
                 return RedirectToAction("Index");
             }
